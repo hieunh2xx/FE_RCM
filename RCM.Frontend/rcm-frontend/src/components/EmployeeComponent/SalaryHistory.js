@@ -4,20 +4,37 @@ import { toast } from "react-toastify";
 
 const SalaryHistory = () => {
   const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bonusSalary, setBonusSalary] = useState(0);
+  const [penalty, setPenalty] = useState(0);
 
   useEffect(() => {
-    fetch(
-      `http://localhost:5000/api/Payroll/list?month=${selectedMonth}&year=${selectedYear}`
-    )
-      .then((res) => res.json())
-      .then((data) => setData(data))
-      .catch((err) => console.error("Error fetching data:", err));
-  }, [selectedMonth, selectedYear]);
+    fetchPayrollData();
+  }, [selectedMonth, selectedYear, searchTerm]);
+
+  const fetchPayrollData = async () => {
+    try {
+      let url = `http://localhost:5000/api/Payroll/getAllPayroll?month=${selectedMonth}&year=${selectedYear}`;
+      if (searchTerm.trim()) {
+        url += `&search=${encodeURIComponent(searchTerm)}`;
+      }
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+      setData(await response.json());
+    } catch (err) {
+      console.error("Lỗi khi gọi API:", err);
+    }
+  };
 
   const exportFile = async () => {
     try {
@@ -48,6 +65,50 @@ const SalaryHistory = () => {
     } catch (error) {
       console.error("Lỗi khi tải file:", error);
       toast.error("Tải file thất bại. Vui lòng thử lại!");
+    }
+  };
+
+  const openModal = async (employeeId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/Payroll/details?employeeId=${employeeId}&month=${selectedMonth}&year=${selectedYear}`
+      );
+      if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu nhân viên");
+      const employee = await response.json();
+      setSelectedEmployee(employee);
+      setBonusSalary(employee.bonusSalary);
+      setPenalty(employee.penalty);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu nhân viên:", error);
+    }
+  };
+
+  const updateSalary = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/Payroll/update-salary",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            employeeId: selectedEmployee.employeeId,
+            fixedSalary: selectedEmployee.fixedSalary,
+            startDate: new Date().toISOString(),
+            endDate: new Date().toISOString(),
+            finalSalary: 0,
+            bonusSalary,
+            penalty,
+          }),
+        }
+      );
+      if (!response.ok) throw new Error("Cập nhật thất bại");
+      toast.success("Cập nhật lương thành công!");
+      setIsModalOpen(false);
+      fetchPayrollData();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật lương:", error);
+      toast.error("Cập nhật thất bại!");
     }
   };
 
@@ -91,6 +152,8 @@ const SalaryHistory = () => {
                 className="form-control"
                 placeholder="Tìm kiếm"
                 style={{ width: "30rem" }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
               <button className="btn btn-primary d-flex align-items-center px-4">
                 Tìm kiếm
@@ -119,6 +182,7 @@ const SalaryHistory = () => {
                 <th className="border p-2 text-center">Thưởng</th>
                 <th className="border p-2 text-center">Phạt</th>
                 <th className="border p-2 text-center">Tổng lương</th>
+                <th className="border p-2 text-center">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -155,12 +219,56 @@ const SalaryHistory = () => {
                       currency: "VND",
                     }).format(item.totalSalary)}
                   </td>
+                  <td className="border p-2 text-center font-bold">
+                    <button
+                      className="bg-yellow-500 text-white px-2 py-1 rounded "
+                      onClick={() => openModal(item.employeeId)}
+                    >
+                      Thưởng/Phạt
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+      {/* Modal cập nhật lương */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-5 rounded shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Cập Nhật Lương</h2>
+            <label className="block mb-2">Tiền thưởng:</label>
+            <input
+              type="number"
+              value={bonusSalary}
+              onChange={(e) => setBonusSalary(e.target.value)}
+              className="border p-2 w-full mb-4"
+            />
+            <label className="block mb-2">Tiền phạt:</label>
+            <input
+              type="number"
+              value={penalty}
+              onChange={(e) => setPenalty(e.target.value)}
+              className="border p-2 w-full mb-4"
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Hủy
+              </button>
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+                onClick={updateSalary}
+              >
+                Cập nhật
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
