@@ -79,7 +79,10 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-white">RCM</h1>
             <nav className="flex space-x-4">
-              <Link to="/home" className="text-white flex items-center">
+              <Link
+                to="/home"
+                className="text-white flex items-center no-underline"
+              >
                 Tổng quan
               </Link>
               <div className="relative" onMouseLeave={closeDropdown}>
@@ -93,19 +96,19 @@ const Header = () => {
                   <div className="absolute bg-white shadow-md rounded p-2 z-50">
                     <Link
                       to="/button1"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Danh sách sản phẩm
                     </Link>
                     <Link
                       to="/button2"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Kiểm kho
                     </Link>
                     <Link
                       to="/button3"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Nhập hàng
                     </Link>
@@ -123,19 +126,19 @@ const Header = () => {
                   <div className="absolute bg-white shadow-md rounded p-2 z-50">
                     <Link
                       to="/button6"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Bán hàng
                     </Link>
                     <Link
                       to="/button5"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Đổi trả hàng
                     </Link>
                     <Link
                       to="/button4"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Phiếu nhập hàng
                     </Link>
@@ -153,19 +156,19 @@ const Header = () => {
                   <div className="absolute bg-white shadow-md rounded p-2 z-50">
                     <Link
                       to="/button7"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Nhà cung cấp
                     </Link>
                     <Link
                       to="/button8"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       ...
                     </Link>
                     <Link
                       to="/button9"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       ...
                     </Link>
@@ -184,19 +187,19 @@ const Header = () => {
                   <div className="absolute bg-white shadow-md rounded p-2 z-50">
                     <Link
                       to="/staffmanage"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Danh sách nhân viên
                     </Link>
                     <Link
                       to="/salary"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Lương
                     </Link>
                     <Link
                       to="/button12"
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
                     >
                       Thiết lập lương
                     </Link>
@@ -204,18 +207,24 @@ const Header = () => {
                 )}
               </div>
 
-              <Link to="/soquy" className="text-white flex items-center">
+              <Link
+                to="/soquy"
+                className="text-white flex items-center no-underline"
+              >
                 Sổ quỹ
               </Link>
-              <Link to="/baocao" className="text-white flex items-center">
+              <Link
+                to="/baocao"
+                className="text-white flex items-center no-underline"
+              >
                 Báo cáo
               </Link>
             </nav>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 ">
             <Link
               to="/sales"
-              className="bg-white text-blue-600 px-4 py-2 rounded flex items-center"
+              className="bg-white text-blue-600 px-4 py-2 rounded flex items-center no-underline"
             >
               Bán hàng
             </Link>
