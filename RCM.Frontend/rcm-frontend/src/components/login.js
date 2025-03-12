@@ -29,12 +29,13 @@ const LoginPage = () => {
       );
 
       if (response.data) {
-        const { token, role, username } = response.data;
+        const { token, role, username, employeeId } = response.data;
 
         // Lưu vào localStorage
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
         localStorage.setItem("username", username);
+        localStorage.setItem("employeeId", employeeId);
 
         // Xác định điều hướng dựa trên role
         if (role === 1) {

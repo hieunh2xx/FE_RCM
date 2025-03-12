@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 
-const employeeId = 2;
+const employeeId = localStorage.getItem("employeeId");
 
 const Calendar = () => {
   const [attendance, setAttendance] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [checkInMessage, setCheckInMessage] = useState(null);
 
   useEffect(() => {
     fetchAttendanceData();
@@ -54,6 +55,12 @@ const Calendar = () => {
         console.log("Check-in thành công:", data);
         fetchAttendanceData(); // Cập nhật lại dữ liệu sau khi check-in
         setModalOpen(false);
+        setCheckInMessage({
+          message: data.thông_báo,
+          status: data.trạng_thái,
+          time: data.thời_gian_checkin,
+          fine: data.tiền_phạt,
+        });
       })
       .catch((error) => console.error("Lỗi check-in:", error));
   };
@@ -188,7 +195,7 @@ const Calendar = () => {
                     {hasCheckedIn ? hasCheckedOut || "Chưa Check-out" : "-"}
                   </p>
 
-                  {isToday && !hasCheckedIn && currentHour < 17 && (
+                  {isToday && !hasCheckedIn && (
                     <button
                       className="mt-4 p-2 bg-blue-500 text-white rounded mr-16"
                       onClick={handleCheckIn}
@@ -196,7 +203,7 @@ const Calendar = () => {
                       Check-in
                     </button>
                   )}
-                  {hasCheckedIn && !hasCheckedOut && currentHour >= 17 && (
+                  {hasCheckedIn && !hasCheckedOut && (
                     <button
                       className="mt-4 p-2 bg-red-500 text-white rounded mr-16"
                       onClick={handleCheckOut}
@@ -210,6 +217,29 @@ const Calendar = () => {
             <button
               className="mt-4 p-2 bg-gray-400 text-white rounded"
               onClick={() => setModalOpen(false)}
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+      {/* thông báo trạng thái */}
+      {checkInMessage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-xl font-bold mb-2">Thông báo Check-in</h2>
+            <p>
+              <strong>Trạng thái:</strong> {checkInMessage.status}
+            </p>
+            <p>
+              <strong>Thời gian:</strong> {checkInMessage.time}
+            </p>
+            <p>
+              <strong>Tiền phạt:</strong> {checkInMessage.fine}
+            </p>
+            <button
+              className="mt-4 p-2 bg-gray-400 text-white rounded"
+              onClick={() => setCheckInMessage(null)}
             >
               Đóng
             </button>

@@ -4,27 +4,24 @@ import { toast } from "react-toastify";
 
 const SalaryHistory = () => {
   const [data, setData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isBonusModalOpen, setIsBonusModalOpen] = useState(false);
   const [bonusSalary, setBonusSalary] = useState(0);
   const [penalty, setPenalty] = useState(0);
 
   useEffect(() => {
     fetchPayrollData();
-  }, [selectedMonth, selectedYear, searchTerm]);
+  }, [selectedMonth, selectedYear]);
 
   const fetchPayrollData = async () => {
     try {
       let url = `http://localhost:5000/api/Payroll/getAllPayroll?month=${selectedMonth}&year=${selectedYear}`;
-      if (searchTerm.trim()) {
-        url += `&search=${encodeURIComponent(searchTerm)}`;
-      }
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -68,7 +65,7 @@ const SalaryHistory = () => {
     }
   };
 
-  const openModal = async (employeeId) => {
+  const openDetailModal = async (employeeId) => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/Payroll/details?employeeId=${employeeId}&month=${selectedMonth}&year=${selectedYear}`
@@ -76,12 +73,17 @@ const SalaryHistory = () => {
       if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu nhân viên");
       const employee = await response.json();
       setSelectedEmployee(employee);
-      setBonusSalary(employee.bonusSalary);
-      setPenalty(employee.penalty);
-      setIsModalOpen(true);
+      setIsDetailModalOpen(true);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu nhân viên:", error);
     }
+  };
+
+  const openBonusModal = (employee) => {
+    setSelectedEmployee(employee);
+    setBonusSalary(employee.bonusSalary);
+    setPenalty(employee.penalty);
+    setIsBonusModalOpen(true);
   };
 
   const updateSalary = async () => {
@@ -104,7 +106,7 @@ const SalaryHistory = () => {
       );
       if (!response.ok) throw new Error("Cập nhật thất bại");
       toast.success("Cập nhật lương thành công!");
-      setIsModalOpen(false);
+      setIsBonusModalOpen(false);
       fetchPayrollData();
     } catch (error) {
       console.error("Lỗi khi cập nhật lương:", error);
@@ -146,19 +148,6 @@ const SalaryHistory = () => {
             </div>
           </div>
           <div className="flex justify-between items-center mb-4">
-            <div className="d-flex gap-2 w-50">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Tìm kiếm"
-                style={{ width: "30rem" }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button className="btn btn-primary d-flex align-items-center px-4">
-                Tìm kiếm
-              </button>
-            </div>
             <div className="space-x-2">
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded ml-2"
@@ -173,21 +162,24 @@ const SalaryHistory = () => {
           <table className="w-full border-collapse border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border p-2 text-center">ID Nhân viên</th>
+                <th className="border p-2 text-center">Mã Nhân viên</th>
                 <th className="border p-2 text-center">Tên nhân viên</th>
                 <th className="border p-2 text-center">SĐT</th>
                 <th className="border p-2 text-center">Lương cố định</th>
                 <th className="border p-2 text-center">Số ngày công</th>
                 <th className="border p-2 text-center">Lương ngày</th>
                 <th className="border p-2 text-center">Thưởng</th>
-                <th className="border p-2 text-center">Phạt</th>
                 <th className="border p-2 text-center">Tổng lương</th>
                 <th className="border p-2 text-center">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {data.map((item) => (
-                <tr key={item.employeeId} className="hover:bg-gray-50">
+                <tr
+                  key={item.employeeId}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => openDetailModal(item.employeeId)}
+                >
                   <td className="border p-2 text-center">{item.employeeId}</td>
                   <td className="border p-2">{item.employeeName}</td>
                   <td className="border p-2 text-center">{item.phone}</td>
@@ -212,7 +204,6 @@ const SalaryHistory = () => {
                       currency: "VND",
                     }).format(item.bonusSalary)}
                   </td>
-                  <td className="border p-2 text-center">{item.penalty}</td>
                   <td className="border p-2 text-center font-bold">
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
@@ -222,7 +213,10 @@ const SalaryHistory = () => {
                   <td className="border p-2 text-center font-bold">
                     <button
                       className="bg-yellow-500 text-white px-2 py-1 rounded "
-                      onClick={() => openModal(item.employeeId)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openBonusModal(item);
+                      }}
                     >
                       Thưởng/Phạt
                     </button>
@@ -234,7 +228,7 @@ const SalaryHistory = () => {
         </div>
       </div>
       {/* Modal cập nhật lương */}
-      {isModalOpen && (
+      {isBonusModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="bg-white p-5 rounded shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">Cập Nhật Lương</h2>
@@ -255,7 +249,7 @@ const SalaryHistory = () => {
             <div className="flex justify-end space-x-2">
               <button
                 className="bg-gray-500 text-white px-4 py-2 rounded"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => setIsBonusModalOpen(false)}
               >
                 Hủy
               </button>
@@ -264,6 +258,82 @@ const SalaryHistory = () => {
                 onClick={updateSalary}
               >
                 Cập nhật
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal thông tin lương nhân viên */}
+      {isDetailModalOpen && selectedEmployee && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div
+            className="bg-white p-6 rounded shadow-lg"
+            style={{ width: "500px" }}
+          >
+            <h1 className="text-2xl font-bold mb-4 uppercase">
+              Chi Tiết Nhân Viên
+            </h1>
+
+            <p className="text-xl">
+              <strong>Mã Nhân Viên:</strong> {selectedEmployee.employeeId}
+            </p>
+            <p className="text-xl">
+              <strong>Họ tên:</strong> {selectedEmployee.employee.fullName}
+            </p>
+            <p className="text-xl">
+              <strong>Giới tính:</strong>{" "}
+              {selectedEmployee.employee.gender === "Female" ? "Nữ" : "Nam"}
+            </p>
+            <p className="text-xl">
+              <strong>Ngày Sinh:</strong>{" "}
+              {new Date(selectedEmployee.employee.birthDate).toLocaleDateString(
+                "vi-VN"
+              )}
+            </p>
+            <p className="text-xl">
+              <strong>Địa chỉ hiện tại:</strong>{" "}
+              {selectedEmployee.employee.currentAddress}
+            </p>
+            <p className="text-xl">
+              <strong>CCCD:</strong> {selectedEmployee.employee.identityNumber}
+            </p>
+            <p className="text-xl">
+              <strong>SĐT:</strong> {selectedEmployee.employee.phoneNumber}
+            </p>
+            <p className="text-xl">
+              <strong>Lương cố định:</strong>{" "}
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(selectedEmployee.fixedSalary)}
+            </p>
+            <p className="text-xl">
+              <strong>Ngày bắt đầu làm việc:</strong>{" "}
+              {new Date(selectedEmployee.employee.startDate).toLocaleDateString(
+                "vi-VN"
+              )}
+            </p>
+            <p className="text-xl">
+              <strong>Thưởng:</strong>{" "}
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(selectedEmployee.bonusSalary)}
+            </p>
+            <p className="text-xl">
+              <strong>Tổng lương:</strong>{" "}
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(selectedEmployee.finalSalary)}
+            </p>
+
+            <div className="flex justify-center space-x-2 mt-10">
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsDetailModalOpen(false)}
+              >
+                Đóng
               </button>
             </div>
           </div>

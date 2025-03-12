@@ -44,10 +44,6 @@ export default function StaffManager() {
       console.error("Lỗi khi lấy danh sách nhân viên:", error);
     }
   };
-
-  const handleSearch = () => {
-    fetchStaff(searchTerm);
-  };
   const openUpdateModal = async (id) => {
     try {
       const response = await axios.get(`http://localhost:5000/api/Staff/${id}`);
@@ -66,7 +62,9 @@ export default function StaffManager() {
       setValue("hometown", staffData.hometown);
       setValue("currentAddress", staffData.currentAddress);
       setValue("branchId", staffData.branchId);
+      setValue("fixedSalary", staffData.fixedSalary);
       setIsModalOpen(true);
+      setStep(1);
     } catch (error) {
       console.error("Lỗi khi lấy thông tin nhân viên:", error);
       toast.error("Không thể lấy thông tin nhân viên!", {
@@ -111,6 +109,7 @@ export default function StaffManager() {
   };
   const closeModal = () => {
     setIsModalOpen(false);
+    setStep(1); // Reset về bước đầu tiên khi đóng modal
     reset();
   };
   // Xử lý chọn file
@@ -172,30 +171,27 @@ export default function StaffManager() {
     <>
       <Header />
       <div className="p-10 h-screen bg-gray-100">
-        <div className="flex justify-between items-center mb-4">
-          <div className="d-flex gap-2 w-50">
+        <div className=" mx-auto flex flex-col xl:flex-row justify-between items-center mb-4 space-y-2 xl:space-y-0">
+          {/* Ô tìm kiếm */}
+          <div className="flex flex-col lg:flex-row gap-2 w-full lg:w-1/2">
             <input
               type="text"
-              className="form-control"
+              className="form-control w-full lg:w-[30rem] px-3 py-2 border rounded"
               placeholder="Theo tên nhân viên"
-              style={{ width: "30rem" }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button
-              className="btn btn-primary d-flex align-items-center px-4"
-              onClick={handleSearch}
-            >
-              Tìm kiếm
-            </button>
           </div>
-          <div className="space-x-2">
+
+          {/* Các nút thao tác */}
+          <div className="flex flex-nowrap justify-center lg:justify-end gap-2 w-full lg:w-auto overflow-hidden">
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded"
+              className="bg-green-500 text-white px-4 py-2 rounded min-w-[120px]"
               onClick={() => setIsModalOpen(true)}
             >
               Thêm nhân viên
             </button>
+
             <input
               type="file"
               accept=".xlsx, .xls, .csv"
@@ -203,26 +199,30 @@ export default function StaffManager() {
               id="fileInput"
               onChange={handleFileChange}
             />
+
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              className="bg-blue-500 text-white px-4 py-2 rounded min-w-[120px]"
               onClick={() => document.getElementById("fileInput").click()}
             >
               Nhập File
             </button>
+
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded ml-2"
+              className="bg-green-500 text-white px-4 py-2 rounded min-w-[120px]"
               onClick={() => exportFile("xlsx")}
             >
               Xuất Excel
             </button>
+
             <button
-              className="bg-yellow-500 text-white px-4 py-2 rounded ml-2"
+              className="bg-yellow-500 text-white px-4 py-2 rounded min-w-[120px]"
               onClick={() => exportFile("csv")}
             >
               Xuất CSV
             </button>
           </div>
         </div>
+
         <table className="w-full bg-white shadow-md rounded">
           <thead className="bg-gray-100">
             <tr>
@@ -270,7 +270,7 @@ export default function StaffManager() {
                     >
                       Sửa
                     </button>
-                    <button className="bg-red-500 text-white px-2 py-1 rounded">
+                    <button className="bg-red-500 text-white px-2 py-1 rounded md:mt-2 md:ml-2">
                       Xóa
                     </button>
                   </td>
@@ -406,7 +406,10 @@ export default function StaffManager() {
                     <button
                       type="button"
                       className="bg-blue-500 text-white px-4 py-2 rounded ml-auto"
-                      onClick={() => setStep(step + 1)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setStep(step + 1);
+                      }}
                     >
                       Tiếp theo
                     </button>

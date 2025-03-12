@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaSortDown, FaSortUp } from "react-icons/fa";
+import { FaSortUp } from "react-icons/fa";
 import {
   eachWeekOfInterval,
   eachDayOfInterval,
