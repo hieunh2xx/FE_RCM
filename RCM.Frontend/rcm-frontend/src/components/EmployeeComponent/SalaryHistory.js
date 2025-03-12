@@ -268,65 +268,73 @@ const SalaryHistory = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div
             className="bg-white p-6 rounded shadow-lg"
-            style={{ width: "500px" }}
+            style={{ width: "660px" }}
           >
             <h1 className="text-2xl font-bold mb-4 uppercase">
-              Chi Tiết Nhân Viên
+              Chi Tiết Lương Tháng {selectedMonth}/{selectedYear} Của{" "}
+              {selectedEmployee.employee.fullName}
             </h1>
 
-            <p className="text-xl">
-              <strong>Mã Nhân Viên:</strong> {selectedEmployee.employeeId}
-            </p>
-            <p className="text-xl">
-              <strong>Họ tên:</strong> {selectedEmployee.employee.fullName}
-            </p>
-            <p className="text-xl">
-              <strong>Giới tính:</strong>{" "}
-              {selectedEmployee.employee.gender === "Female" ? "Nữ" : "Nam"}
-            </p>
-            <p className="text-xl">
-              <strong>Ngày Sinh:</strong>{" "}
-              {new Date(selectedEmployee.employee.birthDate).toLocaleDateString(
-                "vi-VN"
-              )}
-            </p>
-            <p className="text-xl">
-              <strong>Địa chỉ hiện tại:</strong>{" "}
-              {selectedEmployee.employee.currentAddress}
-            </p>
-            <p className="text-xl">
-              <strong>CCCD:</strong> {selectedEmployee.employee.identityNumber}
-            </p>
-            <p className="text-xl">
-              <strong>SĐT:</strong> {selectedEmployee.employee.phoneNumber}
-            </p>
-            <p className="text-xl">
-              <strong>Lương cố định:</strong>{" "}
-              {new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }).format(selectedEmployee.fixedSalary)}
-            </p>
-            <p className="text-xl">
-              <strong>Ngày bắt đầu làm việc:</strong>{" "}
-              {new Date(selectedEmployee.employee.startDate).toLocaleDateString(
-                "vi-VN"
-              )}
-            </p>
-            <p className="text-xl">
-              <strong>Thưởng:</strong>{" "}
-              {new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }).format(selectedEmployee.bonusSalary)}
-            </p>
-            <p className="text-xl">
-              <strong>Tổng lương:</strong>{" "}
-              {new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }).format(selectedEmployee.finalSalary)}
-            </p>
+            <div className="space-y-2">
+              {[
+                { label: "Mã Nhân Viên", value: selectedEmployee.employeeId },
+                { label: "Họ tên", value: selectedEmployee.employee.fullName },
+                {
+                  label: "Giới tính",
+                  value:
+                    selectedEmployee.employee.gender === "Female"
+                      ? "Nữ"
+                      : "Nam",
+                },
+                {
+                  label: "Ngày Sinh",
+                  value: new Date(
+                    selectedEmployee.employee.birthDate
+                  ).toLocaleDateString("vi-VN"),
+                },
+                {
+                  label: "Địa chỉ hiện tại",
+                  value: selectedEmployee.employee.currentAddress,
+                },
+                {
+                  label: "CCCD",
+                  value: selectedEmployee.employee.identityNumber,
+                },
+                { label: "SĐT", value: selectedEmployee.employee.phoneNumber },
+                {
+                  label: "Lương cố định",
+                  value: new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(selectedEmployee.fixedSalary),
+                },
+                {
+                  label: "Ngày bắt đầu làm việc",
+                  value: new Date(
+                    selectedEmployee.employee.startDate
+                  ).toLocaleDateString("vi-VN"),
+                },
+                {
+                  label: "Thưởng",
+                  value: new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(selectedEmployee.bonusSalary),
+                },
+                {
+                  label: "Tổng lương",
+                  value: new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(selectedEmployee.finalSalary),
+                },
+              ].map((item, index) => (
+                <div key={index} className="flex">
+                  <strong className="w-1/2 text-xl">{item.label}:</strong>
+                  <span className="flex-1 text-xl">{item.value}</span>
+                </div>
+              ))}
+            </div>
 
             <div className="flex justify-center space-x-2 mt-10">
               <button

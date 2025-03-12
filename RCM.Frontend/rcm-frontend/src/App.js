@@ -10,7 +10,6 @@ import Header from "./headerComponent/header";
 import SalesChartPage from "./sale-dashboadConponent/SalesChartPage";
 import StaffManager from "./components/EmployeeComponent/StaffManager";
 import { ToastContainer } from "react-toastify";
-import RegisterStaff from "./components/EmployeeComponent/RegisterStaff";
 import SalaryHistory from "./components/EmployeeComponent/SalaryHistory";
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -28,7 +27,6 @@ function App() {
 
           {/* Trang Login */}
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterStaff />} />
           <Route path="/attendance" element={<Attendance />} />
           {/* Các trang cần đăng nhập */}
           <Route
