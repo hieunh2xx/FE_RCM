@@ -10,6 +10,7 @@ export default function StaffManager() {
   const [warehouses, setWarehouses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStaff, setSelectedStaff] = useState(null); // Nhân viên đang sửa
+  const [step, setStep] = useState(1);
   const { register, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
       role: 2, // Mặc định role = 2
@@ -19,8 +20,8 @@ export default function StaffManager() {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchStaff(searchTerm);
+      fetchWarehouses();
     }, 300); // Chờ 300ms để tránh gọi API quá nhiều lần
-
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
   const fetchWarehouses = async () => {
@@ -295,108 +296,128 @@ export default function StaffManager() {
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-lg font-bold mb-4">
-                {" "}
                 {selectedStaff ? "Cập nhật nhân viên" : "Thêm nhân viên"}
               </h2>
               <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="space-y-2">
-                  <label className="block font-medium">Họ tên</label>
-                  <input
-                    {...register("fullName")}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <label className="block font-medium">Tên đăng nhập</label>
-                  <input
-                    {...register("username")}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <label className="block font-medium">Ngày sinh</label>
-                  <input
-                    type="date"
-                    {...register("birthDate")}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <label className="block font-medium">Giới tính</label>
-                  <select
-                    {...register("gender")}
-                    className="w-full p-2 border rounded"
-                  >
-                    <option value="Male">Nam</option>
-                    <option value="Female">Nữ</option>
-                  </select>
-                  <label className="block font-medium">Số điện thoại</label>
-                  <input
-                    {...register("phoneNumber")}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <label className="block font-medium">Ca làm việc</label>
-                  <select
-                    {...register("workShiftId")}
-                    className="w-full p-2 border rounded"
-                  >
-                    <option value="1">Ca sáng</option>
-                    <option value="2">Ca chiều</option>
-                  </select>
-                  <label className="block font-medium">Kho Hàng</label>
-                  <select
-                    {...register("branchId")}
-                    className="w-full p-2 border rounded"
-                  >
-                    <option value="">Chọn Kho Hàng</option>
-                    {warehouses.map((warehouse) => (
-                      <option key={warehouse.id} value={warehouse.id}>
-                        {warehouse.name}
-                      </option>
-                    ))}
-                  </select>
-                  <label className="block font-medium">Lương cố định</label>
-                  <input
-                    type="number"
-                    {...register("fixedSalary")}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <label className="block font-medium">Số CMND/CCCD</label>
-                  <input
-                    type="text"
-                    {...register("identityNumber")}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <label className="block font-medium">Quê quán</label>
-                  <input
-                    type="text"
-                    {...register("hometown")}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <label className="block font-medium">Địa chỉ hiện tại</label>
-                  <input
-                    type="text"
-                    {...register("currentAddress")}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                {/* Nút Lưu và Hủy */}
-                <div className="flex justify-end space-x-2 mt-4">
-                  <button
-                    type="button"
-                    className="bg-gray-400 text-white px-4 py-2 rounded"
-                    onClick={closeModal}
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 rounded"
-                  >
-                    {selectedStaff ? "Cập nhật" : "Lưu"}
-                  </button>
+                {step === 1 && (
+                  <div className="space-y-2">
+                    <label className="block font-medium">Họ tên</label>
+                    <input
+                      {...register("fullName")}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+
+                    <label className="block font-medium">Tên đăng nhập</label>
+                    <input
+                      {...register("username")}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+
+                    <label className="block font-medium">Mật Khẩu</label>
+                    <input
+                      type="password"
+                      {...register("passwordHash")}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+
+                    <label className="block font-medium">Ngày sinh</label>
+                    <input
+                      type="date"
+                      {...register("birthDate")}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+
+                    <label className="block font-medium">Giới tính</label>
+                    <select
+                      {...register("gender")}
+                      className="w-full p-2 border rounded"
+                    >
+                      <option value="Male">Nam</option>
+                      <option value="Female">Nữ</option>
+                    </select>
+
+                    <label className="block font-medium">Số điện thoại</label>
+                    <input
+                      {...register("phoneNumber")}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="space-y-2">
+                    <label className="block font-medium">Ca làm việc</label>
+                    <select
+                      {...register("workShiftId")}
+                      className="w-full p-2 border rounded"
+                    >
+                      <option value="1">Ca sáng</option>
+                      <option value="2">Ca chiều</option>
+                    </select>
+
+                    <label className="block font-medium">Kho hàng</label>
+                    <select
+                      {...register("branchId")}
+                      className="w-full p-2 border rounded"
+                    >
+                      <option value="">Chọn Kho Hàng</option>
+                      {warehouses.map((warehouse) => (
+                        <option key={warehouse.id} value={warehouse.id}>
+                          {warehouse.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    <label className="block font-medium">Lương cố định</label>
+                    <input
+                      type="number"
+                      {...register("fixedSalary")}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+
+                    <label className="block font-medium">Số CMND/CCCD</label>
+                    <input
+                      type="text"
+                      {...register("identityNumber")}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="flex justify-between mt-4">
+                  {step > 1 && (
+                    <button
+                      type="button"
+                      className="bg-gray-400 text-white px-4 py-2 rounded"
+                      onClick={() => setStep(step - 1)}
+                    >
+                      Quay lại
+                    </button>
+                  )}
+
+                  {step < 2 ? (
+                    <button
+                      type="button"
+                      className="bg-blue-500 text-white px-4 py-2 rounded ml-auto"
+                      onClick={() => setStep(step + 1)}
+                    >
+                      Tiếp theo
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="bg-green-500 text-white px-4 py-2 rounded ml-auto"
+                    >
+                      {selectedStaff ? "Cập nhật" : "Lưu"}
+                    </button>
+                  )}
                 </div>
               </form>
             </div>
