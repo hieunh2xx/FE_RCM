@@ -100,7 +100,7 @@ const SalaryHistory = () => {
             endDate: new Date().toISOString(),
             finalSalary: 0,
             bonusSalary,
-            penalty,
+            penalty: 0,
           }),
         }
       );
@@ -168,9 +168,9 @@ const SalaryHistory = () => {
                 <th className="border p-2 text-center">Lương cố định</th>
                 <th className="border p-2 text-center">Số ngày công</th>
                 <th className="border p-2 text-center">Lương ngày</th>
-                <th className="border p-2 text-center">Thưởng</th>
-                <th className="border p-2 text-center">Tổng lương</th>
-                <th className="border p-2 text-center">Thao tác</th>
+                <th className="border p-2 text-center">Tiền thưởng tăng ca</th>
+                <th className="border p-2 text-center">Tiền lương hiện tại</th>
+                {/* <th className="border p-2 text-center">Thao tác</th> */}
               </tr>
             </thead>
             <tbody>
@@ -210,7 +210,7 @@ const SalaryHistory = () => {
                       currency: "VND",
                     }).format(item.totalSalary)}
                   </td>
-                  <td className="border p-2 text-center font-bold">
+                  {/* <td className="border p-2 text-center font-bold">
                     <button
                       className="bg-yellow-500 text-white px-2 py-1 rounded "
                       onClick={(e) => {
@@ -218,9 +218,9 @@ const SalaryHistory = () => {
                         openBonusModal(item);
                       }}
                     >
-                      Thưởng/Phạt
+                      Thưởng tăng ca
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>
@@ -228,7 +228,7 @@ const SalaryHistory = () => {
         </div>
       </div>
       {/* Modal cập nhật lương */}
-      {isBonusModalOpen && (
+      {/* {isBonusModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="bg-white p-5 rounded shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">Cập Nhật Lương</h2>
@@ -237,13 +237,6 @@ const SalaryHistory = () => {
               type="number"
               value={bonusSalary}
               onChange={(e) => setBonusSalary(e.target.value)}
-              className="border p-2 w-full mb-4"
-            />
-            <label className="block mb-2">Tiền phạt:</label>
-            <input
-              type="number"
-              value={penalty}
-              onChange={(e) => setPenalty(e.target.value)}
               className="border p-2 w-full mb-4"
             />
             <div className="flex justify-end space-x-2">
@@ -262,7 +255,7 @@ const SalaryHistory = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       {/* Modal thông tin lương nhân viên */}
       {isDetailModalOpen && selectedEmployee && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
@@ -315,14 +308,14 @@ const SalaryHistory = () => {
                   ).toLocaleDateString("vi-VN"),
                 },
                 {
-                  label: "Thưởng",
+                  label: "Thưởng tăng ca",
                   value: new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   }).format(selectedEmployee.bonusSalary),
                 },
                 {
-                  label: "Tổng lương",
+                  label: "Tiền lương hiện tại: ",
                   value: new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
