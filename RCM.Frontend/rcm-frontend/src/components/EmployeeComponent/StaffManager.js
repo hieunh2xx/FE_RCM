@@ -81,6 +81,9 @@ export default function StaffManager() {
             ...data,
             fixedSalary: Number(data.fixedSalary),
             birthDate: new Date(data.birthDate).toISOString(),
+            note: "",
+            penaltyAmount: 0,
+            totalPenaltyAmount: "",
           }
         );
         toast.success("Cập nhật nhân viên thành công!", {
@@ -96,6 +99,9 @@ export default function StaffManager() {
           fixedSalary: Number(data.fixedSalary),
           birthDate: new Date(data.birthDate).toISOString(),
           startDate: new Date().toISOString().split("T")[0],
+          note: "",
+          penaltyAmount: 0,
+          totalPenaltyAmount: "",
         });
         toast.success("Thêm nhân viên thành công!", { position: "top-right" });
       }
@@ -373,7 +379,7 @@ export default function StaffManager() {
                       ))}
                     </select>
 
-                    <label className="block font-medium">Lương cố định</label>
+                    <label className="block font-medium">Lương theo ngày</label>
                     <input
                       type="number"
                       {...register("fixedSalary")}

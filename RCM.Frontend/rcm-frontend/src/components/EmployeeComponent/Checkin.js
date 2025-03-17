@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { toast } from "react-toastify";
 
 const employeeId = localStorage.getItem("employeeId");
 
@@ -44,25 +45,36 @@ const Calendar = () => {
       .catch((error) => console.error("Lỗi lấy dữ liệu:", error));
   };
 
-  const handleCheckIn = () => {
-    fetch("http://localhost:5000/api/Attendance/CheckIn", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ employeeId }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Check-in thành công:", data);
-        fetchAttendanceData(); // Cập nhật lại dữ liệu sau khi check-in
-        setModalOpen(false);
-        setCheckInMessage({
-          message: data.thông_báo,
-          status: data.trạng_thái,
-          time: data.thời_gian_checkin,
-          fine: data.tiền_phạt,
-        });
-      })
-      .catch((error) => console.error("Lỗi check-in:", error));
+  const handleCheckIn = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/Attendance/CheckIn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeId }),
+      });
+
+      if (!res.ok) {
+        // Nếu response không OK, lấy lỗi trả về dưới dạng text
+        const errorText = await res.text();
+        throw new Error(errorText || "Đã có lỗi xảy ra!");
+      }
+
+      const data = await res.json();
+      console.log("Check-in thành công:", data);
+
+      fetchAttendanceData(); // Cập nhật lại dữ liệu sau khi check-in
+      setModalOpen(false);
+
+      setCheckInMessage({
+        message: data.thông_báo,
+        status: data.trạng_thái,
+        time: data.thời_gian_checkin,
+      });
+      toast.success("Checkin thành công", { position: "top-right" });
+    } catch (error) {
+      console.error("Lỗi check-in:", error.message);
+      toast.error(error.message, { position: "top-right" });
+    }
   };
 
   const handleCheckOut = () => {
@@ -71,13 +83,23 @@ const Calendar = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ employeeId }),
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) {
+          // Nếu response không OK (ví dụ 400, 500)
+          const textData = await res.text(); // Đọc dữ liệu trả về dưới dạng text
+          throw new Error(textData || "Đã có lỗi xảy ra!"); // Ném lỗi để bắt trong catch
+        }
+        return res.json(); // Nếu OK, parse JSON
+      })
       .then((data) => {
         console.log("Check-out thành công:", data);
         fetchAttendanceData(); // Cập nhật lại dữ liệu sau khi check-out
         setModalOpen(false);
+        toast.success("Checkout thành công", { position: "top-right" });
       })
-      .catch((error) => console.error("Lỗi check-out:", error));
+      .catch((error) => {
+        toast.error(error.message, { position: "top-right" });
+      });
   };
   const getColorClass = (dateStr) => {
     const todayStr = format(new Date(), "yyyy-MM-dd");

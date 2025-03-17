@@ -29,7 +29,7 @@ const LoginPage = () => {
       );
 
       if (response.data) {
-        const { token, role, username, employeeId } = response.data;
+        const { token, role, username, employeeId, shift } = response.data;
 
         // Lưu vào localStorage
         localStorage.setItem("token", token);

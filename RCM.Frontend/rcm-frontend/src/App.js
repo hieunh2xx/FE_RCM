@@ -23,7 +23,15 @@ function App() {
         <Routes>
           {/* Định tuyến trang mặc định về Login nếu chưa có token */}
           <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/checkin" element={<EmployeeCheckInDetail />} />
+          <Route
+            path="/checkin"
+            element={
+              <>
+                <EmployeeCheckInDetail />
+                <ToastContainer position="top-right" autoClose={3000} />
+              </>
+            }
+          />
 
           {/* Trang Login */}
           <Route path="/login" element={<LoginPage />} />
