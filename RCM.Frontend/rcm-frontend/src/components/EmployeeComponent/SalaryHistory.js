@@ -169,7 +169,7 @@ const SalaryHistory = () => {
                 <th className="border p-2 text-center">Lương ngày</th>
                 <th className="border p-2 text-center">Số ngày công</th>
                 <th className="border p-2 text-center">Số giờ tăng ca</th>
-                <th className="border p-2 text-center">Tổng tiền tăng ca</th>
+                <th className="border p-2 text-center">Lương tăng ca</th>
                 <th className="border p-2 text-center">Tiền thưởng</th>
                 <th className="border p-2 text-center">Tiền lương hiện tại</th>
                 {/* <th className="border p-2 text-center">Thao tác</th> */}
@@ -185,7 +185,9 @@ const SalaryHistory = () => {
                   <td className="border p-2 text-center">{item.employeeId}</td>
                   <td className="border p-2">{item.employeeName}</td>
                   <td className="border p-2 text-center">{item.phone}</td>
-                  <td className="border p-2 text-center">{item.currentAddress}</td>
+                  <td className="border p-2 text-center">
+                    {item.currentAddress}
+                  </td>
                   <td className="border p-2 text-center">
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
