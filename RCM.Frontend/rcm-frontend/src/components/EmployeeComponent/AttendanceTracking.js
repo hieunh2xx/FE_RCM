@@ -24,30 +24,53 @@ const fetchAttendanceData = async (startDate, endDate, setAttendanceData) => {
       const dayData = data[date];
       const formattedDate = format(parseISO(date), "yyyy-MM-dd");
 
-      [...dayData.attendedEmployees, ...dayData.notAttendedEmployees].forEach(
-        (emp) => {
-          if (!mergedData[emp.id]) {
-            mergedData[emp.id] = {
-              id: emp.id,
-              name: emp.fullName,
-              birthDate: format(parseISO(emp.birthDate), "yyyy-MM-dd"),
-              avatar:
-                emp.image ||
-                "https://icons.veryicon.com/png/o/miscellaneous/standard/avatar-15.png",
-              attendance: {},
-            };
-          }
-
-          mergedData[emp.id].attendance[formattedDate] = {
-            morning: emp.checkInTime
-              ? format(parseISO(emp.checkInTime), "HH:mm")
-              : "-",
-            afternoon: emp.checkOutTime
-              ? format(parseISO(emp.checkOutTime), "HH:mm")
-              : "-",
+      // Xử lý attendedRecords
+      dayData.attendedRecords.forEach((emp) => {
+        if (!mergedData[emp.id]) {
+          mergedData[emp.id] = {
+            id: emp.id,
+            name: emp.fullName,
+            birthDate: format(parseISO(emp.birthDate), "yyyy-MM-dd"),
+            avatar:
+              emp.image ||
+              "https://icons.veryicon.com/png/o/miscellaneous/standard/avatar-15.png",
+            attendance: {},
           };
         }
-      );
+
+        // Cập nhật giờ check-in và check-out cho nhân viên đã tham dự
+        mergedData[emp.id].attendance[formattedDate] = {
+          morning: emp.checkInTime
+            ? format(parseISO(emp.checkInTime), "HH:mm")
+            : "-",
+          afternoon: emp.checkOutTime
+            ? format(parseISO(emp.checkOutTime), "HH:mm")
+            : "-",
+        };
+      });
+
+      // Xử lý notAttendedRecords
+      dayData.notAttendedRecords.forEach((emp) => {
+        if (!mergedData[emp.id]) {
+          mergedData[emp.id] = {
+            id: emp.id,
+            name: emp.fullName,
+            birthDate: format(parseISO(emp.birthDate), "yyyy-MM-dd"),
+            avatar:
+              emp.image ||
+              "https://icons.veryicon.com/png/o/miscellaneous/standard/avatar-15.png",
+            attendance: {},
+          };
+        }
+
+        // Nếu không có dữ liệu check-in/check-out, hiển thị "-"
+        if (!mergedData[emp.id].attendance[formattedDate]) {
+          mergedData[emp.id].attendance[formattedDate] = {
+            morning: "-",
+            afternoon: "-",
+          };
+        }
+      });
     });
     setAttendanceData(Object.values(mergedData));
   } catch (error) {
@@ -82,20 +105,24 @@ const EmployeeTable = () => {
   useEffect(() => {
     const newWeeks = getWeeksInMonth(selectedYear, selectedMonth);
     setWeeks(newWeeks);
-    setSelectedWeek(
-      newWeeks.find((week) => week >= format(currentWeekStart, "yyyy-MM-dd")) ||
-        newWeeks[0]
-    );
+
+    // Nếu không có tuần nào được chọn, chọn tuần đầu tiên
+    if (!selectedWeek || !newWeeks.includes(selectedWeek)) {
+      setSelectedWeek(newWeeks[0]);
+    }
   }, [selectedYear, selectedMonth]);
 
   useEffect(() => {
     if (!selectedWeek) return;
+
     const start = parseISO(selectedWeek);
     const end = endOfWeek(start, { weekStartsOn: 1 });
     const dates = eachDayOfInterval({ start, end }).map((date) =>
       format(date, "yyyy-MM-dd")
     );
     setWeekDates(dates);
+
+    // Lấy dữ liệu cho toàn bộ tuần
     fetchAttendanceData(dates[0], dates[dates.length - 1], setEmployees);
   }, [selectedWeek]);
 
