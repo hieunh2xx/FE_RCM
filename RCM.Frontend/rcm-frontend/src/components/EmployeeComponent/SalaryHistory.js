@@ -14,6 +14,7 @@ const SalaryHistory = () => {
   const [isBonusModalOpen, setIsBonusModalOpen] = useState(false);
   const [bonusSalary, setBonusSalary] = useState(0);
   const [penalty, setPenalty] = useState(0);
+  const [modalStep, setModalStep] = useState(1);
 
   useEffect(() => {
     fetchPayrollData();
@@ -73,6 +74,7 @@ const SalaryHistory = () => {
       if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu nhân viên");
       const employee = await response.json();
       setSelectedEmployee(employee);
+      setModalStep(1);
       setIsDetailModalOpen(true);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu nhân viên:", error);
@@ -272,75 +274,124 @@ const SalaryHistory = () => {
             style={{ width: "660px" }}
           >
             <h1 className="text-2xl font-bold mb-4 uppercase">
-              Chi Tiết Lương Tháng {selectedMonth}/{selectedYear} Của{" "}
-              {selectedEmployee.employee.fullName}
+              {modalStep === 1
+                ? `Chi Tiết Lương Tháng ${selectedMonth}/${selectedYear} Của ${selectedEmployee.employeeName}`
+                : `Lịch Sử Thanh Toán`}
             </h1>
+            {modalStep === 1 && (
+              <div className="space-y-2">
+                {[
+                  { label: "Mã Nhân Viên", value: selectedEmployee.employeeId },
+                  { label: "Họ tên", value: selectedEmployee.employeeName },
+                  { label: "Số điện thoại", value: selectedEmployee.phone },
+                  { label: "CCCD", value: selectedEmployee.identityNumber },
+                  { label: "Địa chỉ", value: selectedEmployee.currentAddress },
+                  { label: "Quê quán", value: selectedEmployee.hometown },
+                  {
+                    label: "Lương ngày",
+                    value: new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(selectedEmployee.fixedSalary),
+                  },
+                  {
+                    label: "Số ngày công",
+                    value: selectedEmployee.totalWorkDays,
+                  },
+                  {
+                    label: "Số ca làm việc",
+                    value: selectedEmployee.totalShifts,
+                  },
+                  {
+                    label: "Số giờ tăng ca",
+                    value: selectedEmployee.totalOvertimeHours,
+                  },
+                  {
+                    label: "Lương tăng ca",
+                    value: new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(selectedEmployee.overtimePay),
+                  },
+                  {
+                    label: "Tiền thưởng",
+                    value: new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(selectedEmployee.bonusSalary),
+                  },
+                  {
+                    label: "Tổng lương",
+                    value: new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(selectedEmployee.totalSalary),
+                  },
+                ].map((item, index) => (
+                  <div key={index} className="flex">
+                    <strong className="w-1/2 text-xl">{item.label}:</strong>
+                    <span className="flex-1 text-xl">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {/* Lịch sử thanh toán */}
+            {modalStep === 2 && (
+              <div>
+                <h2 className="text-xl font-bold mb-2">Lịch sử thanh toán</h2>
+                <table className="w-full border-collapse border">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border p-2 text-center">Ngày</th>
+                      <th className="border p-2 text-center">Số tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedEmployee.paymentHistory.length > 0 ? (
+                      selectedEmployee.paymentHistory.map((payment, idx) => (
+                        <tr key={idx}>
+                          <td className="border p-2 text-center">
+                            {new Date(payment.paymentDate).toLocaleDateString(
+                              "vi-VN"
+                            )}
+                          </td>
+                          <td className="border p-2 text-center">
+                            {payment.paidAmount.toLocaleString("vi-VN")} VND
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="2" className="border p-2 text-center">
+                          Chưa có lịch sử thanh toán
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
-            <div className="space-y-2">
-              {[
-                { label: "Mã Nhân Viên", value: selectedEmployee.employeeId },
-                { label: "Họ tên", value: selectedEmployee.employee.fullName },
-                {
-                  label: "Giới tính",
-                  value:
-                    selectedEmployee.employee.gender === "Female"
-                      ? "Nữ"
-                      : "Nam",
-                },
-                {
-                  label: "Ngày Sinh",
-                  value: new Date(
-                    selectedEmployee.employee.birthDate
-                  ).toLocaleDateString("vi-VN"),
-                },
-                {
-                  label: "Địa chỉ hiện tại",
-                  value: selectedEmployee.employee.currentAddress,
-                },
-                {
-                  label: "CCCD",
-                  value: selectedEmployee.employee.identityNumber,
-                },
-                { label: "SĐT", value: selectedEmployee.employee.phoneNumber },
-                {
-                  label: "Lương cố định",
-                  value: new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(selectedEmployee.fixedSalary),
-                },
-                {
-                  label: "Ngày bắt đầu làm việc",
-                  value: new Date(
-                    selectedEmployee.employee.startDate
-                  ).toLocaleDateString("vi-VN"),
-                },
-                {
-                  label: "Thưởng tăng ca",
-                  value: new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(selectedEmployee.bonusSalary),
-                },
-                {
-                  label: "Tiền lương hiện tại: ",
-                  value: new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(selectedEmployee.finalSalary),
-                },
-              ].map((item, index) => (
-                <div key={index} className="flex">
-                  <strong className="w-1/2 text-xl">{item.label}:</strong>
-                  <span className="flex-1 text-xl">{item.value}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex justify-center space-x-2 mt-10">
+            <div className="flex justify-between mt-6">
+              {modalStep === 2 && (
+                <button
+                  onClick={() => setModalStep(1)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                >
+                  Quay lại
+                </button>
+              )}
+              {modalStep === 1 && (
+                <button
+                  onClick={() => setModalStep(2)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Xem lịch sử
+                </button>
+              )}
               <button
-                className="bg-gray-500 text-white px-4 py-2 rounded"
                 onClick={() => setIsDetailModalOpen(false)}
+                className="bg-red-500 text-white px-4 py-2 rounded"
               >
                 Đóng
               </button>
