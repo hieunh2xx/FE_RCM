@@ -172,7 +172,7 @@ const SalaryHistory = () => {
                 <th className="border p-2 text-center">Số ngày công</th>
                 <th className="border p-2 text-center">Số giờ tăng ca</th>
                 <th className="border p-2 text-center">Lương tăng ca</th>
-                <th className="border p-2 text-center">Tiền thưởng</th>
+                {/* <th className="border p-2 text-center">Tiền thưởng</th> */}
                 <th className="border p-2 text-center">Tiền lương hiện tại</th>
                 {/* <th className="border p-2 text-center">Thao tác</th> */}
               </tr>
@@ -208,12 +208,12 @@ const SalaryHistory = () => {
                       currency: "VND",
                     }).format(item.overtimePay)}
                   </td>
-                  <td className="border p-2 text-center">
+                  {/* <td className="border p-2 text-center">
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     }).format(item.bonusSalary)}
-                  </td>
+                  </td> */}
                   <td className="border p-2 text-center font-bold">
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
