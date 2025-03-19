@@ -11,6 +11,8 @@ import {
   parseISO,
 } from "date-fns";
 import { vi } from "date-fns/locale";
+import Header from "../../headerComponent/header";
+import { useNavigate } from "react-router-dom";
 
 const fetchAttendanceData = async (startDate, endDate, setAttendanceData) => {
   try {
@@ -87,6 +89,7 @@ const getWeeksInMonth = (year, month) => {
 };
 
 const EmployeeTable = () => {
+  const navigate = useNavigate();
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
@@ -131,88 +134,97 @@ const EmployeeTable = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex justify-between items-center p-4 border-b bg-white shadow">
-        <div className="text-lg font-bold">Lịch Làm Việc Hàng Tuần</div>
-        <div className="flex gap-2">
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="border p-2 rounded"
-          >
-            {[...Array(5)].map((_, idx) => (
-              <option key={idx} value={currentYear - 2 + idx}>
-                {currentYear - 2 + idx}
-              </option>
-            ))}
-          </select>
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-            className="border p-2 rounded"
-          >
-            {[...Array(12)].map((_, idx) => (
-              <option key={idx} value={idx + 1}>
-                {idx + 1}
-              </option>
-            ))}
-          </select>
-          <select
-            value={selectedWeek}
-            onChange={(e) => setSelectedWeek(e.target.value)}
-            className="border p-2 rounded"
-          >
-            {weeks.map((week, idx) => (
-              <option key={idx} value={week}>{`Week ${
-                idx + 1
-              } (${week})`}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <div className="flex-grow overflow-x-auto p-2">
-        <table className="w-full border-collapse border">
-          <thead>
-            <tr>
-              <th
-                className="border p-2 bg-gray-100 cursor-pointer flex items-center gap-1"
-                onClick={toggleSortOrder}
-              >
-                Employee Info {<FaSortUp />}
-              </th>
-              {weekDates.map((date, index) => (
-                <th key={index} className="border p-2 bg-gray-100 text-center">
-                  {format(parseISO(date), "EEEE (dd/MM)", { locale: vi })}
-                </th>
+    <div>
+      <Header />
+      <div className="h-screen flex flex-col mt-5">
+        <div className="flex justify-between items-center p-4 border-b bg-white shadow">
+          <div className="text-lg font-bold">Lịch Làm Việc Hàng Tuần</div>
+          <div className="flex gap-2">
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              className="border p-2 rounded"
+            >
+              {[...Array(5)].map((_, idx) => (
+                <option key={idx} value={currentYear - 2 + idx}>
+                  {currentYear - 2 + idx}
+                </option>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((emp) => (
-              <tr key={emp.id}>
-                <td className="border p-2 text-left">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={emp.avatar}
-                      alt="Avatar"
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                      <div className="font-bold">{emp.name}</div>
-                      <div className="text-sm">{emp.birthDate}</div>
-                    </div>
-                  </div>
-                </td>
+            </select>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+              className="border p-2 rounded"
+            >
+              {[...Array(12)].map((_, idx) => (
+                <option key={idx} value={idx + 1}>
+                  {idx + 1}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedWeek}
+              onChange={(e) => setSelectedWeek(e.target.value)}
+              className="border p-2 rounded"
+            >
+              {weeks.map((week, idx) => (
+                <option key={idx} value={week}>{`Tuần ${
+                  idx + 1
+                } (${week})`}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="flex-grow overflow-x-auto p-2">
+          <table className="w-full border-collapse border">
+            <thead>
+              <tr>
+                <th
+                  className="border p-2 bg-gray-100 cursor-pointer flex items-center gap-1"
+                  onClick={toggleSortOrder}
+                >
+                  Nhân Viên {<FaSortUp />}
+                </th>
                 {weekDates.map((date, index) => (
-                  <td key={index} className="border p-2 text-center">
-                    <div>{emp.attendance[date]?.morning || "-"}</div>
-                    <div>{emp.attendance[date]?.afternoon || "-"}</div>
-                  </td>
+                  <th
+                    key={index}
+                    className="border p-2 bg-gray-100 text-center"
+                  >
+                    {format(parseISO(date), "EEEE (dd/MM)", { locale: vi })}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {employees.map((emp) => (
+                <tr key={emp.id}>
+                  <td
+                    className="border p-2 text-left"
+                    onClick={() => navigate(`/attendance-detail/${emp.id}`)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={emp.avatar}
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div>
+                        <div className="font-bold">{emp.name}</div>
+                        <div className="text-sm">{emp.birthDate}</div>
+                      </div>
+                    </div>
+                  </td>
+                  {weekDates.map((date, index) => (
+                    <td key={index} className="border p-2 text-center">
+                      <div>{emp.attendance[date]?.morning || "-"}</div>
+                      <div>{emp.attendance[date]?.afternoon || "-"}</div>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

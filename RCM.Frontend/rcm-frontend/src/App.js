@@ -11,6 +11,7 @@ import SalesChartPage from "./sale-dashboadConponent/SalesChartPage";
 import StaffManager from "./components/EmployeeComponent/StaffManager";
 import { ToastContainer } from "react-toastify";
 import SalaryHistory from "./components/EmployeeComponent/SalaryHistory";
+import AttendanceTable from "./components/EmployeeComponent/AttendanceTable";
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   return token ? children : <Navigate to="/login" />;
@@ -23,11 +24,21 @@ function App() {
         <Routes>
           {/* Định tuyến trang mặc định về Login nếu chưa có token */}
           <Route path="/" element={<Navigate to="/login" />} />
+          {/* <Route path="/att" element={<AttendanceTable />} /> */}
+          <Route
+            path="/attendance-detail/:id"
+            element={
+              <>
+                <AttendanceTable />
+                <ToastContainer position="top-right" autoClose={3000} />
+              </>
+            }
+          />
           <Route
             path="/checkin"
             element={
               <>
-                <EmployeeCheckInDetail />
+                <AttendanceTable />
                 <ToastContainer position="top-right" autoClose={3000} />
               </>
             }

@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 
-const employeeId = localStorage.getItem("employeeId");
+// const employeeId = localStorage.getItem("employeeId");
 
 const Calendar = () => {
+  const { id } = useParams(); // Lấy id từ URL (nếu có)
+  const employeeId = id || localStorage.getItem("employeeId"); // Nếu có id, dùng id, không thì lấy từ localStorage
   const [attendance, setAttendance] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -66,9 +69,11 @@ const Calendar = () => {
       setModalOpen(false);
 
       setCheckInMessage({
-        message: data.thông_báo,
-        status: data.trạng_thái,
-        time: data.thời_gian_checkin,
+        message: data.message,
+        shift: data.shift,
+        status: data.status,
+        time: data.timeCheckIn,
+        overtime: data.overtime
       });
       toast.success("Checkin thành công", { position: "top-right" });
     } catch (error) {

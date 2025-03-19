@@ -71,155 +71,197 @@ const Header = () => {
       );
     }
   };
+  const role = localStorage.getItem("role");
 
   return (
     <>
       <header className="bg-white shadow-md">
         <div className="flex items-center justify-between p-4 bg-blue-600">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-white">RCM</h1>
-            <nav className="flex space-x-4">
-              <Link
-                to="/home"
-                className="text-white flex items-center no-underline"
-              >
-                Tổng quan
-              </Link>
-              <div className="relative" onMouseLeave={closeDropdown}>
-                <button
-                  onClick={() => handleDropdown("goods")}
-                  className="text-white flex items-center"
+            <Link
+              to="/home"
+              className="text-2xl font-bold text-white no-underline"
+            >
+              RCM
+            </Link>
+            {(role === "1" || role === "2") && (
+              <nav className="flex space-x-4">
+                <Link
+                  to="/home"
+                  className="text-white flex items-center no-underline"
                 >
-                  Hàng hóa
-                </button>
-                {activeDropdown === "goods" && (
-                  <div className="absolute bg-white shadow-md rounded p-2 z-50">
-                    <Link
-                      to="/button1"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      Danh sách sản phẩm
-                    </Link>
-                    <Link
-                      to="/button2"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      Kiểm kho
-                    </Link>
-                    <Link
-                      to="/button3"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      Nhập hàng
-                    </Link>
-                  </div>
-                )}
-              </div>
-              <div className="relative" onMouseLeave={closeDropdown}>
-                <button
-                  onClick={() => handleDropdown("transactions")}
-                  className="text-white flex items-center"
-                >
-                  Giao dịch
-                </button>
-                {activeDropdown === "transactions" && (
-                  <div className="absolute bg-white shadow-md rounded p-2 z-50">
-                    <Link
-                      to="/button6"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      Bán hàng
-                    </Link>
-                    <Link
-                      to="/button5"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      Đổi trả hàng
-                    </Link>
-                    <Link
-                      to="/button4"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      Phiếu nhập hàng
-                    </Link>
-                  </div>
-                )}
-              </div>
-              <div className="relative" onMouseLeave={closeDropdown}>
-                <button
-                  onClick={() => handleDropdown("partners")}
-                  className="text-white flex items-center"
-                >
-                  Đối tác
-                </button>
-                {activeDropdown === "partners" && (
-                  <div className="absolute bg-white shadow-md rounded p-2 z-50">
-                    <Link
-                      to="/button7"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      Nhà cung cấp
-                    </Link>
-                    <Link
-                      to="/button8"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      ...
-                    </Link>
-                    <Link
-                      to="/button9"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
-                    >
-                      ...
-                    </Link>
-                  </div>
-                )}
-              </div>
+                  Tổng quan
+                </Link>
 
-              <div className="relative" onMouseLeave={closeDropdown}>
-                <button
-                  onClick={() => handleDropdown("employees")}
-                  className="text-white flex items-center"
-                >
-                  Nhân viên
-                </button>
-                {activeDropdown === "employees" && (
-                  <div className="absolute bg-white shadow-md rounded p-2 z-50">
+                {role === "1" && (
+                  <>
+                    <div className="relative" onMouseLeave={closeDropdown}>
+                      <button
+                        onClick={() => handleDropdown("goods")}
+                        className="text-white flex items-center"
+                      >
+                        Hàng hóa
+                      </button>
+                      {activeDropdown === "goods" && (
+                        <div className="absolute bg-white shadow-md rounded p-2 z-50">
+                          <Link
+                            to="/button1"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Danh sách sản phẩm
+                          </Link>
+                          <Link
+                            to="/button2"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Kiểm kho
+                          </Link>
+                          <Link
+                            to="/button3"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Nhập hàng
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="relative" onMouseLeave={closeDropdown}>
+                      <button
+                        onClick={() => handleDropdown("transactions")}
+                        className="text-white flex items-center"
+                      >
+                        Giao dịch
+                      </button>
+                      {activeDropdown === "transactions" && (
+                        <div className="absolute bg-white shadow-md rounded p-2 z-50">
+                          <Link
+                            to="/button6"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Bán hàng
+                          </Link>
+                          <Link
+                            to="/button5"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Đổi trả hàng
+                          </Link>
+                          <Link
+                            to="/button4"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Phiếu nhập hàng
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="relative" onMouseLeave={closeDropdown}>
+                      <button
+                        onClick={() => handleDropdown("partners")}
+                        className="text-white flex items-center"
+                      >
+                        Đối tác
+                      </button>
+                      {activeDropdown === "partners" && (
+                        <div className="absolute bg-white shadow-md rounded p-2 z-50">
+                          <Link
+                            to="/button7"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Nhà cung cấp
+                          </Link>
+                          <Link
+                            to="/button8"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            ...
+                          </Link>
+                          <Link
+                            to="/button9"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            ...
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="relative" onMouseLeave={closeDropdown}>
+                      <button
+                        onClick={() => handleDropdown("employees")}
+                        className="text-white flex items-center"
+                      >
+                        Nhân viên
+                      </button>
+                      {activeDropdown === "employees" && (
+                        <div className="absolute bg-white shadow-md rounded p-2 z-50">
+                          <Link
+                            to="/staffmanage"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Danh sách nhân viên
+                          </Link>
+                          <Link
+                            to="/salary"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Lương
+                          </Link>
+                          <Link
+                            to="/button12"
+                            className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                          >
+                            Thiết lập lương
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+
                     <Link
-                      to="/staffmanage"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                      to="/soquy"
+                      className="text-white flex items-center no-underline"
                     >
-                      Danh sách nhân viên
+                      Sổ quỹ
                     </Link>
                     <Link
-                      to="/salary"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                      to="/baocao"
+                      className="text-white flex items-center no-underline"
                     >
-                      Lương
+                      Báo cáo
                     </Link>
-                    <Link
-                      to="/button12"
-                      className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                  </>
+                )}
+
+                {role === "2" && (
+                  <div className="relative" onMouseLeave={closeDropdown}>
+                    <button
+                      onClick={() => handleDropdown("attendance")}
+                      className="text-white flex items-center"
                     >
-                      Thiết lập lương
-                    </Link>
+                      Chấm công
+                    </button>
+                    {activeDropdown === "attendance" && (
+                      <div className="absolute bg-white shadow-md rounded p-2 z-50">
+                        <Link
+                          to="/checkin"
+                          className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                        >
+                          Chấm công
+                        </Link>
+                        <Link
+                          to="/attendance"
+                          className="block px-4 py-2 hover:bg-gray-200 no-underline"
+                        >
+                          Xem chấm công
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-
-              <Link
-                to="/soquy"
-                className="text-white flex items-center no-underline"
-              >
-                Sổ quỹ
-              </Link>
-              <Link
-                to="/baocao"
-                className="text-white flex items-center no-underline"
-              >
-                Báo cáo
-              </Link>
-            </nav>
+              </nav>
+            )}
           </div>
           <div className="flex items-center space-x-4 ">
             <Link
