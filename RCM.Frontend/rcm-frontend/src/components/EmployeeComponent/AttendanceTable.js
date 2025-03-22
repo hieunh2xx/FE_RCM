@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Table, Select, Tag } from "antd";
+import {
+  Table,
+  Select,
+  Tag,
+  Modal,
+  DatePicker,
+  TimePicker,
+  InputNumber,
+  Input,
+} from "antd";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import localeData from "dayjs/plugin/localeData";
@@ -29,6 +38,13 @@ const AttendanceTable = () => {
   const [lateCount, setLateCount] = useState(0);
   const [checkInMessage, setCheckInMessage] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalOvertimeOpen, setModalOvertimeOpen] = useState(false);
+  const [overtimeDate, setOvertimeDate] = useState(
+    dayjs().format("YYYY-MM-DD")
+  );
+  const [startTime, setStartTime] = useState(null);
+  const [totalHours, setTotalHours] = useState(1);
+  const [reason, setReason] = useState("");
 
   useEffect(() => {
     fetchAttendanceData();
@@ -37,7 +53,7 @@ const AttendanceTable = () => {
   const fetchAttendanceData = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/Attendance/AttendanceDetail?employeeId=${employeeId}`
+        `https://localhost:5000/api/Attendance/AttendanceDetail?employeeId=${employeeId}`
       );
       const result = await response.json();
       setData(result);
@@ -68,7 +84,7 @@ const AttendanceTable = () => {
 
   const handleCheckIn = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/Attendance/CheckIn", {
+      const res = await fetch("https://localhost:5000/api/Attendance/CheckIn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employeeId }),
@@ -96,7 +112,7 @@ const AttendanceTable = () => {
     }
   };
   const handleCheckOut = async () => {
-    fetch("http://localhost:5000/api/Attendance/CheckOut", {
+    fetch("https://localhost:5000/api/Attendance/CheckOut", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ employeeId }),
@@ -118,6 +134,47 @@ const AttendanceTable = () => {
       .catch((error) => {
         toast.error(error.message, { position: "top-right" });
       });
+  };
+
+  const resetOvertimeForm = () => {
+    setOvertimeDate(dayjs().format("YYYY-MM-DD"));
+    setStartTime(null);
+    setTotalHours(1);
+    setReason("");
+  };
+
+  const formattedStartTime = dayjs(startTime).format("HH:mm:ss");
+  const handleRequestOvertime = async () => {
+    if (!startTime || totalHours <= 0 || !reason) {
+      toast.error("Vui lòng nhập đầy đủ thông tin tăng ca.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://localhost:5000/api/Attendance/RequestOvertime",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            employeeId,
+            date: overtimeDate,
+            startTime: formattedStartTime,
+            totalHours,
+            reason,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Lỗi khi gửi đề xuất tăng ca");
+      }
+
+      toast.success("Đề xuất tăng ca thành công!");
+      setModalOvertimeOpen(false);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const formatAttendanceData = () => {
@@ -250,16 +307,22 @@ const AttendanceTable = () => {
         {isOwner && (
           <div className="flex justify-between w-full my-4">
             <button
-              className="bg-blue-500 text-white py-2 px-4 rounded w-1/2 mr-2"
+              className="bg-blue-500 text-white py-2 px-4 rounded w-1/3 mr-2 uppercase"
               onClick={handleCheckIn}
             >
               Check In
             </button>
             <button
-              className="bg-red-500 text-white py-2 px-4 rounded w-1/2 ml-2"
+              className="bg-red-500 text-white py-2 px-4 rounded w-1/3 mx-2 uppercase"
               onClick={handleCheckOut}
             >
               Check Out
+            </button>
+            <button
+              className="bg-green-500 text-white py-2 px-4 rounded w-1/3 ml-2 uppercase"
+              onClick={() => setModalOvertimeOpen(true)}
+            >
+              Đề xuất tăng ca
             </button>
           </div>
         )}
@@ -333,6 +396,51 @@ const AttendanceTable = () => {
           </div>
         </div>
       )}
+      <Modal
+        title="Đề xuất tăng ca"
+        open={modalOvertimeOpen} // Sử dụng state modalOvertimeOpen thay vì visible
+        onCancel={() => {
+          resetOvertimeForm();
+          setModalOvertimeOpen(false);
+        }}
+        onOk={handleRequestOvertime}
+        okText="Đề xuất"
+        cancelText="Hủy"
+      >
+        <label>Ngày tăng ca:</label>
+        <DatePicker
+          className="w-full mb-2"
+          value={overtimeDate ? dayjs(overtimeDate) : null}
+          onChange={(date) =>
+            setOvertimeDate(date ? dayjs(date).format("YYYY-MM-DD") : null)
+          }
+        />
+
+        <label>Giờ bắt đầu:</label>
+        <TimePicker
+          className="w-full mb-2"
+          format="HH:mm"
+          value={startTime}
+          onChange={(time) => setStartTime(time)}
+        />
+
+        <label>Tổng số giờ:</label>
+        <InputNumber
+          className="w-full mb-2"
+          min={1}
+          max={12}
+          value={totalHours}
+          onChange={setTotalHours}
+        />
+
+        <label>Lý do:</label>
+        <Input.TextArea
+          className="w-full"
+          rows={3}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

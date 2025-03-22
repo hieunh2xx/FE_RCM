@@ -27,7 +27,7 @@ export default function StaffManager() {
   const fetchWarehouses = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/Warehouses/GetWarehouses"
+        "https://localhost:5000/api/Warehouses/GetWarehouses"
       );
       setWarehouses(response.data);
     } catch (error) {
@@ -37,7 +37,7 @@ export default function StaffManager() {
   const fetchStaff = async (search = "") => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/Staff/getStaff?name=${search}`
+        `https://localhost:5000/api/Staff/getStaff?name=${search}`
       );
       setStaffList(response.data);
     } catch (error) {
@@ -46,7 +46,9 @@ export default function StaffManager() {
   };
   const openUpdateModal = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/Staff/${id}`);
+      const response = await axios.get(
+        `https://localhost:5000/api/Staff/${id}`
+      );
       const staffData = response.data;
       setSelectedStaff(staffData);
 
@@ -76,7 +78,7 @@ export default function StaffManager() {
     try {
       if (selectedStaff) {
         await axios.put(
-          `http://localhost:5000/api/Staff/update-employee/${selectedStaff.id}`,
+          `https://localhost:5000/api/Staff/update-employee/${selectedStaff.id}`,
           {
             ...data,
             fixedSalary: Number(data.fixedSalary),
@@ -90,7 +92,7 @@ export default function StaffManager() {
           position: "top-right",
         });
       } else {
-        await axios.post("http://localhost:5000/api/Staff/add-employee", {
+        await axios.post("https://localhost:5000/api/Staff/add-employee", {
           ...data,
           id: 0,
           role: 2, // Luôn đặt role là 2
@@ -141,7 +143,7 @@ export default function StaffManager() {
     formData.append("file", file);
 
     try {
-      await axios.post("http://localhost:5000/api/Staff/import", formData, {
+      await axios.post("https://localhost:5000/api/Staff/import", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -155,7 +157,7 @@ export default function StaffManager() {
   const exportFile = async (format) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/Staff/export?format=${format}`,
+        `https://localhost:5000/api/Staff/export?format=${format}`,
         {
           responseType: "blob", // Để xử lý file
         }

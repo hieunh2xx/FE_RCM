@@ -21,7 +21,7 @@ const LoginPage = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/Auth/login",
+        "https://localhost:5000/api/Auth/login",
         {
           username,
           password,
@@ -29,18 +29,19 @@ const LoginPage = () => {
       );
 
       if (response.data) {
-        const { token, role, username, employeeId } = response.data;
+        const { token, role, username, branchId, employeeId } = response.data;
 
         // Lưu vào localStorage
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
         localStorage.setItem("username", username);
+        localStorage.setItem("branchId", branchId);
         localStorage.setItem("employeeId", employeeId);
 
         // Xác định điều hướng dựa trên role
-        if (role === 1) {
+        if (role === "Owner") {
           navigate("/home"); // Chủ cửa hàng
-        } else if (role === 2) {
+        } else if (role === "Staff") {
           navigate("/pos"); // Nhân viên bán hàng
         } else {
           setErrorMessage("Quyền truy cập không hợp lệ.");

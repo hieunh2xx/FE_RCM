@@ -84,7 +84,7 @@ const Header = () => {
             >
               RCM
             </Link>
-            {(role === "1" || role === "2") && (
+            {(role === "Owner" || role === "Staff") && (
               <nav className="flex space-x-4">
                 <Link
                   to="/home"
@@ -93,7 +93,7 @@ const Header = () => {
                   Tổng quan
                 </Link>
 
-                {role === "1" && (
+                {role === "Owner" && (
                   <>
                     <div className="relative" onMouseLeave={closeDropdown}>
                       <button
@@ -234,7 +234,7 @@ const Header = () => {
                   </>
                 )}
 
-                {role === "2" && (
+                {role === "Staff" && (
                   <div className="relative" onMouseLeave={closeDropdown}>
                     <button
                       onClick={() => handleDropdown("attendance")}
