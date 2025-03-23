@@ -12,6 +12,7 @@ import StaffManager from "./components/EmployeeComponent/StaffManager";
 import { ToastContainer } from "react-toastify";
 import SalaryHistory from "./components/EmployeeComponent/SalaryHistory";
 import AttendanceTable from "./components/EmployeeComponent/AttendanceTable";
+import PendingOvertimeList from "./components/EmployeeComponent/PendingOvertimeList";
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   return token ? children : <Navigate to="/login" />;
@@ -28,19 +29,28 @@ function App() {
           <Route
             path="/attendance-detail/:id"
             element={
-              <>
+              <ProtectedRoute>
                 <AttendanceTable />
                 <ToastContainer position="top-right" autoClose={3000} />
-              </>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/checkin"
             element={
-              <>
+              <ProtectedRoute>
                 <AttendanceTable />
                 <ToastContainer position="top-right" autoClose={3000} />
-              </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/requests"
+            element={
+              <ProtectedRoute>
+                <PendingOvertimeList />
+                <ToastContainer position="top-right" autoClose={3000} />
+              </ProtectedRoute>
             }
           />
 
