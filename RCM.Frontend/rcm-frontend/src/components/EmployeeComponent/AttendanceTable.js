@@ -68,9 +68,9 @@ const AttendanceTable = () => {
     let lateCounter = 0;
 
     attendanceData.forEach((item) => {
-      const itemDate = dayjs(item.attendanceDate);
+      const itemDate = dayjs(item.attendanceDate, "DD/MM/YYYY"); // Cập nhật cách parse
       if (itemDate.month() + 1 === selectedMonth) {
-        uniqueDates.add(item.attendanceDate);
+        uniqueDates.add(itemDate.format("YYYY-MM-DD")); // Đảm bảo format đồng nhất
 
         if (item.onTimeStatus === "Late") {
           lateCounter++;
@@ -190,91 +190,81 @@ const AttendanceTable = () => {
       );
       const isFutureDate = dayjs(date).isAfter(today);
 
-      // Chuyển đổi shift name để đảm bảo khớp với dữ liệu từ API
       const normalizedData = data.map((item) => ({
         ...item,
-        shift: item.shift.toLowerCase().includes("sáng")
-          ? "Morning"
-          : "Afternoon",
+        shift: item.shift.includes("sáng") ? "Morning" : "Afternoon",
+        attendanceDate: dayjs(item.attendanceDate, [
+          "DD/MM/YYYY",
+          "YYYY-MM-DD",
+        ]).format("YYYY-MM-DD"),
       }));
 
       const attendances = normalizedData.filter(
-        (item) => dayjs(item.attendanceDate).format("YYYY-MM-DD") === date
+        (item) => item.attendanceDate === date
       );
       const morningShift = attendances.find((item) => item.shift === "Morning");
       const afternoonShift = attendances.find(
         (item) => item.shift === "Afternoon"
       );
 
+      const getStatus = (shift) => {
+        if (!shift) return "-"; // Nếu không có ca làm thì hiển thị "-"
+        return shift.onTimeStatus === "Late" ? "Đi muộn" : "Đúng giờ";
+      };
+
       formattedData.push({
         key: date,
         date: dayjs(date).format("DD/MM/YYYY"),
 
-        morningCheckIn: isFutureDate ? (
-          "-"
-        ) : morningShift?.checkInTime ? (
-          <p className="text-xl font-bold">
-            {dayjs(morningShift.checkInTime).format("HH:mm:ss")}
-          </p>
-        ) : (
-          "-"
-        ),
+        morningCheckIn: morningShift?.checkInTime
+          ? dayjs(morningShift.checkInTime, [
+              "DD/MM/YYYY HH:mm:ss",
+              "YYYY-MM-DDTHH:mm:ss",
+            ]).format("HH:mm:ss")
+          : "-",
 
-        morningCheckOut: isFutureDate ? (
-          "-"
-        ) : morningShift?.checkOutTime ? (
-          <p className="text-xl font-bold">
-            {dayjs(morningShift.checkOutTime).format("HH:mm:ss")}
-          </p>
-        ) : (
-          "-"
-        ),
+        morningCheckOut: morningShift?.checkOutTime
+          ? dayjs(morningShift.checkOutTime, [
+              "DD/MM/YYYY HH:mm:ss",
+              "YYYY-MM-DDTHH:mm:ss",
+            ]).format("HH:mm:ss")
+          : "-",
 
-        morningStatus: isFutureDate ? (
-          "-"
-        ) : morningShift ? (
-          <Tag color={morningShift.onTimeStatus === "On Time" ? "blue" : "red"}>
-            {morningShift.onTimeStatus === "On Time" ? "Đúng giờ" : "Muộn"}
-          </Tag>
-        ) : (
-          <Tag color="red">Nghỉ</Tag>
-        ),
+        afternoonCheckIn: afternoonShift?.checkInTime
+          ? dayjs(afternoonShift.checkInTime, [
+              "DD/MM/YYYY HH:mm:ss",
+              "YYYY-MM-DDTHH:mm:ss",
+            ]).format("HH:mm:ss")
+          : "-",
 
-        afternoonCheckIn: isFutureDate ? (
-          "-"
-        ) : afternoonShift?.checkInTime ? (
-          <p className="text-xl font-bold">
-            {dayjs(afternoonShift.checkInTime).format("HH:mm:ss")}
-          </p>
-        ) : (
-          "-"
-        ),
+        afternoonCheckOut: afternoonShift?.checkOutTime
+          ? dayjs(afternoonShift.checkOutTime, [
+              "DD/MM/YYYY HH:mm:ss",
+              "YYYY-MM-DDTHH:mm:ss",
+            ]).format("HH:mm:ss")
+          : "-",
 
-        afternoonCheckOut: isFutureDate ? (
-          "-"
-        ) : afternoonShift?.checkOutTime ? (
-          <p className="text-xl font-bold">
-            {dayjs(afternoonShift.checkOutTime).format("HH:mm:ss")}
-          </p>
-        ) : (
-          "-"
-        ),
-
-        afternoonStatus: isFutureDate ? (
-          "-"
-        ) : afternoonShift ? (
-          <Tag
-            color={afternoonShift.onTimeStatus === "On Time" ? "blue" : "red"}
-          >
-            {afternoonShift.onTimeStatus === "On Time" ? "Đúng giờ" : "Muộn"}
-          </Tag>
-        ) : (
-          <Tag color="red">Nghỉ</Tag>
-        ),
+        morningStatus: isFutureDate
+          ? "-"
+          : morningShift
+          ? getStatus(morningShift)
+          : "-",
+        afternoonStatus: isFutureDate
+          ? "-"
+          : afternoonShift
+          ? getStatus(afternoonShift)
+          : "-",
       });
     }
 
     return formattedData;
+  };
+
+  const getStatusTag = (status) => {
+    if (status === "-") return status;
+    const color =
+      status === "Đúng giờ" ? "blue" : status === "Đi muộn" ? "red" : "gray";
+    return <Tag color={color}>{status}</Tag>;
   };
 
   return (
@@ -343,6 +333,7 @@ const AttendanceTable = () => {
               title: "Trạng thái Sáng",
               dataIndex: "morningStatus",
               key: "morningStatus",
+              render: (status) => getStatusTag(status),
             },
             {
               title: "Check-in Chiều",
@@ -358,6 +349,7 @@ const AttendanceTable = () => {
               title: "Trạng thái Chiều",
               dataIndex: "afternoonStatus",
               key: "afternoonStatus",
+              render: (status) => getStatusTag(status),
             },
           ]}
           dataSource={formatAttendanceData()}
